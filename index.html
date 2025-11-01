@@ -115,7 +115,7 @@ const pairs = [
   "فاطمة الزهراء البيضة - صباح توهتوه",
   "حفصة امغاري - فتيحة الهلولي",
   "نهيلة كلمام - لبنى الولدي",
-   "صباج توهتوه - فاطمة البيضة",
+  "صباج توهتوه - فاطمة البيضة",
   "فتيحة هلولي - نادية سهبي",
   "فاطمة اهريهرة - مريم المسعودي",
   "عائشة امكون - سهام الراشدي",
@@ -155,21 +155,32 @@ function generateMonth(year, month) {
   
   let date = getFirstMonday(year, month);
   let pairIndex = 0;
+  let wedToggle = false; // لتبديل صباح / فاطمة كل أسبوع
 
   while (date.getMonth() === month) {
     const dayName = days[date.getDay()];
 
-    // نتجاوز الأربعاء، السبت، الأحد
-    if (!["الأربعاء", "السبت", "الأحد"].includes(dayName)) {
+    // ✅ نعرض كل الأيام ما عدا السبت والأحد
+    if (!["السبت", "الأحد"].includes(dayName)) {
       const tr = document.createElement("tr");
-
       const tdDay = document.createElement("td");
       const tdDate = document.createElement("td");
       const tdNames = document.createElement("td");
 
       tdDay.textContent = dayName;
       tdDate.textContent = date.toLocaleDateString("en-GB");
-      tdNames.textContent = pairs[pairIndex];
+
+      // 🔹 معالجة خاصة ليوم الأربعاء فقط
+      if (dayName === "الأربعاء") {
+        const partner = wedToggle ? "صباح توهتوه" : "فاطمة البيضة";
+        tdNames.textContent = `زهرة - ${partner}`;
+        wedToggle = !wedToggle; // التبديل كل أسبوع
+      } else {
+        // باقي الأيام تبقى كما هي حسب القائمة
+        tdNames.textContent = pairs[pairIndex];
+        pairIndex++;
+        if (pairIndex >= pairs.length) pairIndex = 0;
+      }
 
       // 🔶 تلوين اليوم الحالي
       if (tdDate.textContent === todayStr) {
@@ -180,9 +191,6 @@ function generateMonth(year, month) {
       tr.appendChild(tdDate);
       tr.appendChild(tdNames);
       tbody.appendChild(tr);
-
-      pairIndex++;
-      if (pairIndex >= pairs.length) pairIndex = 0;
     }
 
     date.setDate(date.getDate() + 1);
