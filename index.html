@@ -83,7 +83,7 @@
   .today {
     background: #fff9c4 !important; /* أصفر فاتح */
     font-weight: bold;
-    color:green;
+    color: green;
   }
 </style>
 </head>
@@ -130,14 +130,14 @@ const months = [
   "يوليوز", "غشت", "شتنبر", "أكتوبر", "نونبر", "دجنبر"
 ];
 
-// 🔹 تحديد بداية الشهر الحالي
-let currentYear = 2025;
-let currentMonth = 9; // أكتوبر (يبدأ من 0)
+// ✅ التاريخ الحالي
+const today = new Date();
+let currentYear = today.getFullYear();
+let currentMonth = today.getMonth(); // الشهر الحالي (0 = يناير)
+
 const tbody = document.getElementById("tableBody");
 const monthLabel = document.getElementById("monthLabel");
-
-// 🔹 التاريخ الحالي بصيغة اليوم/الشهر/السنة
-const todayStr = new Date().toLocaleDateString("en-GB");
+const todayStr = today.toLocaleDateString("en-GB");
 
 // 🔷 دالة لجلب أول يوم اثنين في الشهر
 function getFirstMonday(year, month) {
@@ -155,12 +155,12 @@ function generateMonth(year, month) {
   
   let date = getFirstMonday(year, month);
   let pairIndex = 0;
-  let wedToggle = false; // لتبديل صباح / فاطمة كل أسبوع
+  let wedToggle = false;
 
   while (date.getMonth() === month) {
     const dayName = days[date.getDay()];
 
-    // ✅ نعرض كل الأيام ما عدا السبت والأحد
+    // ✅ عرض فقط من الاثنين إلى الجمعة
     if (!["السبت", "الأحد"].includes(dayName)) {
       const tr = document.createElement("tr");
       const tdDay = document.createElement("td");
@@ -170,16 +170,13 @@ function generateMonth(year, month) {
       tdDay.textContent = dayName;
       tdDate.textContent = date.toLocaleDateString("en-GB");
 
-      // 🔹 معالجة خاصة ليوم الأربعاء فقط
       if (dayName === "الأربعاء") {
         const partner = wedToggle ? "صباح توهتوه" : "فاطمة البيضة";
         tdNames.textContent = `زهرة - ${partner}`;
-        wedToggle = !wedToggle; // التبديل كل أسبوع
+        wedToggle = !wedToggle;
       } else {
-        // باقي الأيام تبقى كما هي حسب القائمة
         tdNames.textContent = pairs[pairIndex];
-        pairIndex++;
-        if (pairIndex >= pairs.length) pairIndex = 0;
+        pairIndex = (pairIndex + 1) % pairs.length;
       }
 
       // 🔶 تلوين اليوم الحالي
@@ -197,7 +194,7 @@ function generateMonth(year, month) {
   }
 }
 
-// 🔷 أزرار التحكم في الشهور
+// 🔷 أزرار التنقل بين الشهور
 document.getElementById("prevMonth").onclick = () => {
   currentMonth--;
   if (currentMonth < 0) {
@@ -216,7 +213,7 @@ document.getElementById("nextMonth").onclick = () => {
   generateMonth(currentYear, currentMonth);
 };
 
-// 🔷 بدء من أكتوبر (الشهر 9)
+// ✅ يبدأ أوتوماتيكياً من الشهر الحالي
 generateMonth(currentYear, currentMonth);
 </script>
 
